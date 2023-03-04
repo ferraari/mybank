@@ -34,8 +34,30 @@ export default class DBManager {
         return this.id = generate;
     }
 
+    chekcIfUserExists(username: string) : boolean {
+        this.prisma.user.findMany({
+            where: {
+                name: username,
+            },
+        }).then((result) => {
+            if (result.length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        return false;
+    }
+
     public createBankAccount() : void {
         rd.question("Nome da Conta: ", (username) => {
+            if (this.chekcIfUserExists(username)) {
+                console.log("Conta já existe.");
+
+                return this.createBankAccount();
+            }
+            
             rd.question("Password: ", (password) => {
                 this.prisma.user.create({
                     data: {
